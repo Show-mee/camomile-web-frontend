@@ -141,7 +141,7 @@ angular.module('myApp.controllers')
                             $scope.$apply(
                                 function () {
                                     $scope.cache.png[personName] = 'data:image/png;base64,' + annotations[0].data.png;
-                                    $scope.cache.PNG = 
+                                    // $scope.cache.PNG = 
                                 });
 
                             // ... and returns it with no error
