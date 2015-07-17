@@ -343,3 +343,13 @@ th.jh-key{
     position: absolute;
     z-index: 3;
 }
+
+.highlighted {
+    background: #F5F5F5;
+}
+
+#clickable-table > tbody > td:hover{
+    padding: 2px 18px;
+    background-position: 2px 4px;
+    border: gray 2px solid;
+}
