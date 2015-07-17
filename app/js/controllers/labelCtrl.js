@@ -141,7 +141,6 @@ angular.module('myApp.controllers')
                             $scope.$apply(
                                 function () {
                                     $scope.cache.png[personName] = 'data:image/png;base64,' + annotations[0].data.png;
-                                    // $scope.cache.PNG = 
                                 });
 
                             // ... and returns it with no error
@@ -158,12 +157,6 @@ angular.module('myApp.controllers')
 
             $scope.setFaceState = function (personName, newState) {
                 $scope.model.output.known[personName] = newState;
-                var id = personName + newState;
-                $('#'+id).focus();
-                $("#clickable-table  > tbody > tr").removeClass('highlighted');
-                $('#'+personName).addClass('highlighted');
-                $('#'+id).prop("checked", true);
-
             };
 
             // Initializes the data from the queue
@@ -378,18 +371,12 @@ angular.module('myApp.controllers')
                             return;
                         }
                         $scope.model.popQueueElement();
-                    });
+                    })
             };
-
-
-            
 
             $document.on(
                 "keydown",
                 function (event) {
-
-                    // var personsInTable = $("#clickable-table  > tbody > tr").length;
-
                     var targetID = event.target.id;
                     var button_checked = false;
                     if (targetID == 'confirm' || targetID == 'cancel') {
@@ -420,107 +407,49 @@ angular.module('myApp.controllers')
                             $scope.model.skip();
                         });
 
-                        }
+                    }
+                    //Left
+                    if (event.keyCode == 37) {
+                        $scope.$apply(function () {
+                            if ($scope.model.current_time - 0.04 > $scope.model.infbndsec) {
+                                $scope.model.current_time = $scope.model.current_time - 0.04;
+                            } else {
+                                $scope.model.current_time = $scope.model.infbndsec;
+                            }
+                        });
+                    }
+                    //Right
+                    if (event.keyCode == 39) {
+                        $scope.$apply(function () {
+                            if ($scope.model.current_time + 0.04 < $scope.model.supbndsec) {
+                                $scope.model.current_time = $scope.model.current_time + 0.04;
+                            } else {
+                                $scope.model.current_time = $scope.model.supbndsec;
+                            }
+                        });
+                    }
+                    //Up
+                    if (event.keyCode == 38) {
+                        $scope.$apply(function () {
+                            if ($scope.model.current_time - 1 > $scope.model.infbndsec) {
+                                $scope.model.current_time = $scope.model.current_time - 1;
+                            } else {
+                                $scope.model.current_time = $scope.model.infbndsec;
+                            }
+                        });
 
-                    // var checked = $('input:checked', '#clickable-table');
-                    // var checkedRight = 
-                        //Left
-                    // if (event.keyCode == 37) {
-                    //     $scope.$apply(function () {
-
-                    //     });
-                    // }
-                    // //Right
-                    // if (event.keyCode == 39) {
-                    //     $scope.$apply(function () {
-                    //         var focus = event.target;
-                    //         console.log(focus);
-                    //         // var next = 
-
-    //     });
-                    // }
-
-                    var personsInTable = $("#clickable-table  > tbody > tr").length;
-                    var t = $("#clickable-table  > tbody > tr");
-                    if(event.keyCode == 38){
-                        //Up
-                        if(!t.hasClass('highlighted')){
-                            $(t[personsInTable-1]).addClass('highlighted');
-                            var name = t[personsInTable-1].id;
-                            var checked = $("input[name="+name+"]:checked");
-                            $(checked).focus();
-                        }else{
-
-                            var highlighted =  $("#clickable-table  > tbody > tr.highlighted")[0].id;
-                            t.removeClass('highlighted');
-                            var prev = $('#'+highlighted).closest('tr').prev()[0];
-                            if(prev == undefined)
-                                prev = t[personsInTable-1];
-                            $(prev).addClass('highlighted');
-                            var name = prev.id;
-                            var checked = $("input[name="+name+"]:checked");
-                            $(checked).focus();
-
-                        }
-                    }else if(event.keyCode == 40){
-                        //Down
-                        if(!t.hasClass('highlighted')){
-                            $(t[0]).addClass('highlighted');
-                            var name = t[0].id;
-                            var checked = $("input[name="+name+"]:checked");
-                            $(checked).focus();
-
-                      }else{
-                            var highlighted =  $("#clickable-table  > tbody > tr.highlighted")[0].id;
-                            t.removeClass('highlighted');
-                            var next = $('#'+highlighted).closest('tr').next()[0];
-                            if(next == undefined)
-                                next = t[0];
-                            $(next).addClass('highlighted');
-                            var name = next.id;
-                            var checked = $("input[name="+name+"]:checked");
-                            $(checked).focus();
-
-                      }
+                    }
+                    //Down
+                    if (event.keyCode == 40) {
+                        $scope.$apply(function () {
+                            if ($scope.model.current_time + 1 < $scope.model.supbndsec) {
+                                $scope.model.current_time = $scope.model.current_time + 1;
+                            } else {
+                                $scope.model.current_time = $scope.model.supbndsec;
+                            }
+                        });
                     }
                 });
-        
-            var _mugChangeState = function(state, direction){
-                var states = ['dontKnow', 'noFace', 'silentFace', 'speakingFace'];
-                var state_index = states.indexOf(state);
-                if(direction == -1){
-                   state_next = state_index - 1;
-                   state_next = state_next<0? 3 : state_next;
-                }else{
-                   state_next = state_index + 1;
-                   state_next = state_next>3? 0 : state_next;
-                }
-                return states[state_next];
-            };
-
-
-            $scope.tableControl = function(event, personName, state, index){
-                event.preventDefault();
-
-                var personsInTable = $("#clickable-table  > tbody > tr").length;
-                var table = $("#clickable-table  > tbody > tr");
-
-                var keyCode = event.keyCode;
-                if (keyCode == 37){
-                    // Left
-                    var stateNext = _mugChangeState(state, -1);
-                    $scope.setFaceState(personName, stateNext);
-                    console.log($scope.model.output.known);
-                }else if(keyCode == 39){
-                    // Right
-                    var stateNext = _mugChangeState(state, 1);
-                    $scope.setFaceState(personName, stateNext);
-                    console.log($scope.model.output.known);
-                }
-
-                    
-            };
-            
 
         }
     ]);

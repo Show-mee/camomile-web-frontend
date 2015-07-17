@@ -28,8 +28,8 @@ var camomile_api = program.camomile || process.env.CAMOMILE_API;
 var login = program.login || process.env.CAMOMILE_LOGIN;
 var password = program.password || process.env.CAMOMILE_PASSWORD;
 var port = parseInt(program.port || process.env.PORT || '8070', 10);
-var label_in = program.labelIn || process.env.CAMOMILE_QUEUE_IN || 'xu.mediaeval.label.in';
-var label_out = program.labelOut || process.env.CAMOMILE_QUEUE_OUT || 'xu.mediaeval.label.out';
+var label_in = program.labelIn || process.env.CAMOMILE_QUEUE_IN || 'mediaeval.label.in';
+var label_out = program.labelOut || process.env.CAMOMILE_QUEUE_OUT || 'mediaeval.label.out';
 
 // configure express app
 app.configure(function () {
