@@ -43,6 +43,7 @@
                         </form>
                     </div>
                     <div class="col-md-12">
+<<<<<<< HEAD
                         <img ng-repeat="personName in model.candidates"
                         tooltip="{{ personName }}"
                         tooltip-placement="bottom"
@@ -55,6 +56,23 @@
                              width="80px"
                              title="unknown"
                              ng-click="addUnknown()" />
+=======
+                        <div class="mugshot" ng-repeat="personName in model.candidates" 
+                            tooltip="{{ personName }}"
+                            tooltip-placement="bottom" 
+                            ng-click="addPerson(personName)" 
+                            ng-mousemove="switchImage($event)">
+                            <img class="mug" 
+                            src="{{ cache.PNG[personName] }}"/>
+                        </div>
+                        <div class="mugshot" >
+                            <img src="../img/new.png" 
+                                 height="80px"
+                                 width="80px"
+                                 title="unknown"
+                                 ng-click="addUnknown()" />
+                        </div>
+>>>>>>> keyboard
                     </div>
                 </div>
                 <br/>
@@ -80,8 +98,7 @@
                         data-html="true"
                         title="<kbd>ENTER</kbd>"
                         data-content="Validate this annotation when you are done.">
-                        <img src="../img/validate.png"
-                        width="80px"
+                        <img src="../img/validate.png" width="80px"
                         ng-click="model.validate()" />
                     </div>
                 </div>
@@ -97,7 +114,11 @@
                        data-placement="bottom"
                        title="Step 2"
                        data-html="true"
-                       data-content="Decide whether each person is <ul><li>NOT visible</li><li>visible but NOT speaking</li><li>visible AND speaking (must hear their voice)</li></ul>Select ? if you are not sure.<img src='../img/tutorial.png' width='150px'>">
+                       data-content="Decide whether each person is <ul><li>NOT visible</li><li>visible but NOT speaking</li><li>visible AND speaking (must hear their voice)</li></ul>
+                       Select ? if you are not sure.<img src='../img/tutorial.png' width='150px'><br>
+                       Shortcut Keys <br>
+                       <ul><li><kbd>Up/Down</kbd> change row</li>
+                        <li><kbd>Left/Right</kbd> change column</li></ul>">
                     <thead>
                         <tr class="active">
                             <td>
@@ -135,34 +156,35 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr class="cc-selector-2" ng-repeat="personName in model.input.hypothesis" id="{{personName}}">
-                            <td ng-repeat="state in ['dontKnow', 'noFace', 'silentFace', 'speakingFace']"
-                                id="{{ state + personName }}"
-                                ng-click="setFaceState(personName, state)"> 
-                                <input id="{{personName+state}}" ng-checked="model.output.known[personName] == state" type="radio" name="{{personName}}" value="{{state}}" ng-keydown="tableControl($event, personName, state, $index)"/><br>
-                                <label for="{{personName+state}}">
-                                    <img ng-show="model.output.known[personName] == state"
-                                    tooltip="{{ personName }}"
-                                    tooltip-placement="top"
-                                    src="{{ cache.png[personName] }}" width="80px" height="80px" />
-                                </label>
-                            </td>
-                        </tr>
-                        <tr ng-repeat="personName in model.missing" id="{{personName}}">
-                            <td ng-repeat="state in ['dontKnow', 'noFace', 'silentFace', 'speakingFace']"
-                                id="{{ state + personName }}"
+                        <tr ng-repeat="personName in model.input.hypothesis" id="{{personName}}" class="hypothesis" ng-class='{highlighted:$first}'>
+                            <td ng-repeat ="state in ['dontKnow', 'noFace', 'silentFace', 'speakingFace']"
+                                id="{{ $index + personName }}"
                                 ng-click="setFaceState(personName, state)"
-                                ng-dblclick="removePerson(personName)">
-                                <input id="{{personName+state}}" ng-checked="model.output.known[personName] == state" type="radio" name="{{personName}}" value="{{state}}" ng-keydown="tableControl($event, personName, state, $index)"/><br>
-                                <label for="{{personName+state}}">
-                                    <img ng-show="model.output.known[personName] == state"
+                                ng-class="{true: 'checked' , false: 'unchecked'}[model.output.known[personName] == state]"
+                                class="{{state}}">
+                                <div class="mugshot" ng-show="model.output.known[personName] == state"
                                     tooltip="{{ personName }}"
-                                    tooltip-placement="top"
-                                    src="{{ cache.png[personName] }}" width="80px" height="80px" />
-                                </label>
+                                    tooltip-placement="bottom"
+                                    ng-mousemove="switchImage($event)">
+                                    <img class="mug" src="{{cache.PNG[personName] }}"/>
+                                </div>
                             </td>
                         </tr>
-                        <tr ng-if="model.output.unknown">
+                        <tr ng-repeat="personName in model.missing" id="{{personName}}" class="missing" ng-class='{highlighted:$last}'>
+                            <td ng-repeat="state in ['dontKnow', 'noFace', 'silentFace']"
+                                id="{{ state + personName }}"
+                                ng-click="removePerson(personName)">
+                            </td>
+                            <td>
+                                <div class="mugshot"
+                                    tooltip="{{ personName }}"
+                                    tooltip-placement="bottom"
+                                    ng-mousemove="switchImage($event)">
+                                    <img class="mug" src="{{cache.PNG[personName]}}" style="left:" + {{-80 * this.index + "px"}}/>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr ng-if="model.output.unknown" class="unknown highlighted">
                             <td ng-repeat="state in ['dontKnow', 'noFace', 'silentFace']"
                                 ng-dblclick="removeUnknown()">
                             </td>
@@ -172,6 +194,7 @@
                             </td>
                         </tr>
                     </tbody>
+
                 </table>
             </div>
         </div>

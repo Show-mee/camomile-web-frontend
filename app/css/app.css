@@ -348,8 +348,25 @@ th.jh-key{
     background: #F5F5F5;
 }
 
+/*
 #clickable-table > tbody > td:hover{
     padding: 2px 18px;
     background-position: 2px 4px;
     border: gray 2px solid;
+}*/
+
+img{
+    height: 80px;
 }
+.mugshot{
+    height: 80px;
+    width: 80px;
+    overflow: hidden;
+    display: inline-block;
+}
+.mug{
+    position: relative;
+    height: 80px;
+}
+
+

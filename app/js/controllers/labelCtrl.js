@@ -100,7 +100,7 @@ angular.module('myApp.controllers')
 
             var _getPng = function (personName, callback) {
 
-                // if we reach this point, it means that 
+                // if we reach this point, it means that
                 // we know the ID of mugshot layer
 
                 // if personName's mugshot has not been cached yet
@@ -112,7 +112,7 @@ angular.module('myApp.controllers')
                     options.filter.fragment = personName;
                     options.filter.id_layer = $scope.cache.mugshotLayer;
 
-                    // get 
+                    // get
                     camomileService.getAnnotations(
                         function (error, annotations) {
 
@@ -141,7 +141,7 @@ angular.module('myApp.controllers')
                             $scope.$apply(
                                 function () {
                                     $scope.cache.png[personName] = 'data:image/png;base64,' + annotations[0].data.png;
-                                    // $scope.cache.PNG = 
+                                    $scope.cache.PNG[personName] = 'data:image/png;base64,' + annotations[0].data.PNG;
                                 });
 
                             // ... and returns it with no error
@@ -150,7 +150,7 @@ angular.module('myApp.controllers')
 
                 } else {
 
-                    // if we reach this point, it means that we 
+                    // if we reach this point, it means that we
                     // already have cached personName's mugshot
                     callback(null, $scope.cache.png[personName]);
                 }
@@ -190,34 +190,9 @@ angular.module('myApp.controllers')
                     }
 
                     // if current user already annotated this shot
+                    // just try next one...
                     if (item.annotated_by.indexOf(Session.username) > -1) {
-
-                        if (item.skipped_by === undefined) {
-                            item.skipped_by = [];
-                        }
-
-                        var count = 0;
-                        for (var i = 0; i < item.skipped_by.length; ++i) {
-                            if (item.skipped_by[i] === Session.username)
-                                count++;
-                        }
-                        if (count > 2) {
-                            // increment a "already skippped by you" counter
-                            // and do something based on that number
-                            alert('looks like you are the only one working...');
-                        } else {
-                            item.skipped_by.push(Session.username);
-                        }
-
-                        camomileService.enqueue(
-                            $rootScope.queues.labelIn, item,
-                            function (error, data) {
-                                if (error) {
-                                    console.log(data.error);
-                                    return;
-                                }
-                                $scope.model.popQueueElement();
-                            })
+                        $scope.model.popQueueElement();
                         return;
                     }
 
@@ -315,14 +290,19 @@ angular.module('myApp.controllers')
 
                 // defaults this person to "speaking face"
                 $scope.setFaceState(personName, 'speakingFace');
+                //the last row will be highlighted in the html
+                _removeHighlighted();
+
             };
 
             $scope.addUnknown = function (personName) {
                 $scope.model.output.unknown = true;
+                _removeHighlighted();
             };
 
             $scope.removeUnknown = function (personName) {
                 $scope.model.output.unknown = false;
+                _highlightedlastRow();
             };
 
             $scope.removePerson = function (personName) {
@@ -336,6 +316,7 @@ angular.module('myApp.controllers')
 
                 // remove this person from the output
                 $scope.setFaceState(personName, undefined);
+                _highlightedlastRow();
             };
 
             $scope.model.validate = function () {
@@ -362,8 +343,8 @@ angular.module('myApp.controllers')
             };
 
             $scope.model.skip = function () {
-
                 $scope.validating = true;
+<<<<<<< HEAD
 
                 if ($scope.model.input.skipped_by === undefined) {
                     $scope.model.input.skipped_by = [];
@@ -379,6 +360,9 @@ angular.module('myApp.controllers')
                         }
                         $scope.model.popQueueElement();
                     });
+=======
+                $scope.model.popQueueElement();
+>>>>>>> keyboard
             };
 
 
@@ -388,8 +372,11 @@ angular.module('myApp.controllers')
                 "keydown",
                 function (event) {
 
+<<<<<<< HEAD
                     // var personsInTable = $("#clickable-table  > tbody > tr").length;
 
+=======
+>>>>>>> keyboard
                     var targetID = event.target.id;
                     var button_checked = false;
                     if (targetID == 'confirm' || targetID == 'cancel') {
@@ -420,6 +407,7 @@ angular.module('myApp.controllers')
                             $scope.model.skip();
                         });
 
+<<<<<<< HEAD
                         }
 
                     // var checked = $('input:checked', '#clickable-table');
@@ -482,6 +470,40 @@ angular.module('myApp.controllers')
                             $(checked).focus();
 
                       }
+=======
+                    }
+
+                    if(event.keyCode === 38 || event.keyCode === 40){
+                        //Up | Down
+                        event.preventDefault();
+                        _mugChangeRow(event.keyCode);
+                    }
+
+                    if(event.keyCode === 37 || event.keyCode === 39){
+                        //Left  | Right
+                        var trs = $("#clickable-table  > tbody > tr");
+                        var highlighted =  $("#clickable-table  > tbody > tr.highlighted")[0];
+                        var personName = highlighted.id;
+                        if(highlighted.classList.contains('hypothesis')){
+                             // console.log('hypothesis/left');
+                            var checked =  $(highlighted).find('td.checked')[0];
+                            var state_index =  parseInt(checked.id[0]);
+
+                            var new_state = _mugChangeState(state_index, event.keyCode);
+                            $scope.$apply(function () {
+                                $scope.setFaceState(personName, new_state);
+                            });
+                        }else if(highlighted.classList.contains('missing')){
+                            $scope.$apply(function () {
+                                $scope.removePerson(personName);
+                            });
+                        }else{
+                            $scope.$apply(function () {
+                                $scope.removeUnknown();
+                            });
+                        }
+
+>>>>>>> keyboard
                     }
                 });
         
@@ -522,5 +544,79 @@ angular.module('myApp.controllers')
             };
             
 
+                var _mugChangeState = function(state_index, direction){
+
+                    var state_next;
+                    var states = ['dontKnow', 'noFace', 'silentFace', 'speakingFace'];
+                    if(direction === 37){
+                       state_next = state_index - 1;
+                       state_next = state_next<0? 3 : state_next;
+                    }else if(direction === 39){
+                       state_next = state_index + 1;
+                       state_next = state_next>3? 0 : state_next;
+                        
+                    }
+                    return states[state_next];
+                };
+
+                var _mugChangeRow = function(direction){
+                    var next;
+                    var trs = $("#clickable-table  > tbody > tr");
+
+                    if(!trs.hasClass('highlighted')){
+                        //make the first highlighted area
+                        if (direction === 40){
+                            next = $(trs).first()[0];
+                        }else if(direction === 38){
+                            next = $(trs).last()[0];
+                        }
+                    }else{
+                        var highlighted =  $("#clickable-table  > tbody > tr.highlighted")[0];
+                        if (highlighted === undefined)
+                            return null;
+                        if (direction === 40){
+                            next = $(highlighted).closest('tr').next()[0];
+                            if(next === undefined)
+                                next = $(trs).first()[0];
+                        }else if(direction === 38){
+                            next = $(highlighted).closest('tr').prev()[0];
+                            if(next === undefined)
+                                next = $(trs).last()[0];
+                        }
+                    }
+                    $(trs).removeClass('highlighted');
+                    $(next).addClass('highlighted');
+                };
+
+                var _highlightedlastRow =  function(){
+                    var trs = $("#clickable-table  > tbody > tr");
+                    var last =  trs[trs.length-2];
+                    $(trs).removeClass('highlighted');
+                    $(last).addClass('highlighted');
+                };
+
+                var _removeHighlighted =  function(){
+                    var trs = $("#clickable-table  > tbody > tr");
+                    var last =  trs.last();
+                    $(trs).removeClass('highlighted');
+                };
+
+
+            $scope.switchImage = function(e){
+                var x = e.clientX;
+                var image = e.target;
+                var num =  image.width/image.height;
+                 
+                if(num === 1 || isNaN(num)){
+                    return;
+                }
+                var original = $(e.target).parent().offset().left;
+                var relativeX =  x - original;
+                index = Math.floor(relativeX/(80/num));
+                if(index < 0){
+                    return;
+                }
+                e.target.style.left = -80 * index + "px" ;
+            };
         }
     ]);
